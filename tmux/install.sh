@@ -5,4 +5,4 @@ cd "$SCRIPT_PATH"
 
 # copy custom zsh configuration
 cp ./.tmux.conf ~/.tmux.conf
-# tmux source-file ~/.tmux.conf
+tmux source-file ~/.tmux.conf
