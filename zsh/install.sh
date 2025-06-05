@@ -5,7 +5,11 @@ cd "$SCRIPT_PATH"
 rm -rf ~/.oh-my-zsh
 
 # install
+sudo apt install zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 # copy custom zsh configuration
 cp ./.zshrc ~/.zshrc
+
+# default shell
+chsh -s $(which zsh)
