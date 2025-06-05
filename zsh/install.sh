@@ -1,16 +1,10 @@
-$SCRIPT_PATH = $(dirname "$0")
-cd $SCRIPT_PATH
+SCRIPT_DIR=$(dirname "$(realpath "$0")")
+cd "$SCRIPT_PATH"
 
-wget -O zsh.tar.xz https://sourceforge.net/projects/zsh/files/latest/download
-mkdir zsh && unxz zsh.tar.xz && tar -xvf zsh.tar -C zsh --strip-components 1
-cd zsh
+cp ./.zshrc ~/.zshrc
+# exec zsh in .bashrc, if not present
+if ! grep -q "exec zsh" ~/.bashrc; then
+  echo "exec zsh" >>~/.bashrc
+fi
 
-./configure --prefix=$HOME
-make install
-make
-
-# execute zsh in bashrc
-echo "exec zsh" >>~/.bashrc
-
-# cp config
-cp .zshrc ~/.zshrc
+# sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
