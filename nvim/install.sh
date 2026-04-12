@@ -1,36 +1,66 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
-# cleanup nvim
+echo "==> Cleanup Neovim config and caches"
 rm -rf ~/.config/nvim
 rm -rf ~/.local/share/nvim
 rm -rf ~/.local/state/nvim
 rm -rf ~/.cache/nvim
+
+echo "==> Remove old Neovim installation"
 sudo rm -rf /opt/nvim /opt/nvim-linux-x86_64
 sudo rm -f /usr/local/bin/nvim
 
-# install neovim
-curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+echo "==> Download and install Neovim"
+curl -fLO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
 sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz
 sudo mv /opt/nvim-linux-x86_64 /opt/nvim
-sudo ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
+sudo ln -sfn /opt/nvim/bin/nvim /usr/local/bin/nvim
 rm -f nvim-linux-x86_64.tar.gz
 
-# install lazygit
+echo "==> Prepare ~/.local/bin"
+mkdir -p ~/.local
+if [ -e ~/.local/bin ] && [ ! -d ~/.local/bin ]; then
+  echo "WARNING: ~/.local/bin exists but is not a directory. Moving it to ~/.local/bin.backup"
+  mv ~/.local/bin ~/.local/bin.backup
+fi
 mkdir -p ~/.local/bin
-curl -LO https://github.com/jesseduffield/lazygit/releases/download/v0.52.0/lazygit_0.52.0_Linux_x86_64.tar.gz
-tar -xzf lazygit_0.52.0_Linux_x86_64.tar.gz
-mv -f lazygit ~/.local/bin/
-rm -f lazygit_0.52.0_Linux_x86_64.tar.gz
 
-# copy config, but NOT the lockfile
+echo "==> Download and install lazygit"
+curl -fLO https://github.com/jesseduffield/lazygit/releases/download/v0.52.0/lazygit_0.52.0_Linux_x86_64.tar.gz
+tar -xzf lazygit_0.52.0_Linux_x86_64.tar.gz
+install -m 755 lazygit ~/.local/bin/lazygit
+rm -f lazygit lazygit_0.52.0_Linux_x86_64.tar.gz
+
+echo "==> Copy Neovim config without lazy-lock.json"
 mkdir -p ~/.config/nvim
 rsync -av \
   --exclude='lazy-lock.json' \
   --exclude='.git' \
   ./config/ ~/.config/nvim/
 
+echo "==> Refresh shell command hash"
 hash -r || true
 
-echo "nvim -> $(which nvim)"
-nvim --version | head -n 1
+echo "==> Diagnostics"
+echo "which nvim: $(which nvim)"
+echo "type -a nvim:"
+type -a nvim || true
+echo
+echo "ls -l /usr/local/bin/nvim:"
+ls -l /usr/local/bin/nvim || true
+echo
+echo "readlink -f /usr/local/bin/nvim:"
+readlink -f /usr/local/bin/nvim || true
+echo
+echo "/usr/local/bin/nvim --version:"
+/usr/local/bin/nvim --version | head -n 3
+echo
+echo "/opt/nvim/bin/nvim --version:"
+/opt/nvim/bin/nvim --version | head -n 3
+echo
+echo "nvim --version:"
+nvim --version | head -n 3
+
+echo "==> Done"
+echo "Now run: nvim"
