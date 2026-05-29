@@ -15,6 +15,7 @@ rm -rf ~/.cache/nvim
 echo "==> Remove old Neovim installation"
 sudo rm -rf /opt/nvim /opt/nvim-linux-x86_64
 sudo rm -f /usr/local/bin/nvim
+sudo rm -f /usr/bin/nvim
 
 echo "==> Download and install Neovim"
 curl -fLO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
